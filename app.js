@@ -4,43 +4,25 @@ const fs = require('fs')
 const app = express()
 
 // middleware => function that can modify the incoming request data
-// stand between the request and the response
+// stands between the request and the response
 app.use(express.json())
-
-// Get request => Read
-app.get('/', (req, res) => {
-    res.status(200).json({
-        message: 'Hello from the server side!',
-        app: 'Natours!',
-    })
-})
-
-// Post request: Client sends new resource to the server => Create
-app.post('/', (req, res) => {
-    res.send('Posting to this endpoint...')
-})
-
-// Put request: Client sends entire updated object to the server=> Update
-// Patch request: Client sends only part of the updated object that has been changed to the server => Update
-// Delete request: Client removes resource from the server => Delete
 
 const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 )
 
-app.get('/api/v1/tours', (req, res) => {
-    // status 200: OK
+const getAllTours = (req, res) => {
     res.status(200).json({
+        // status 200: OK
         status: 'success',
         results: tours.length, // only relevant to use when you are getting/sending an array with multiple objects
         data: {
             tours, // If data has same name as property (tours), you can exclude the value
         },
     })
-})
+}
 
-// Accounts for specific tours
-app.get('/api/v1/tours/:id', (req, res) => {
+const getTour = (req, res) => {
     console.log(req.params) // req.params => object that assigns value to a variable: id
 
     const id = req.params.id * 1 // converts string that contains numbers into a number
@@ -60,20 +42,20 @@ app.get('/api/v1/tours/:id', (req, res) => {
             tour,
         },
     })
-})
+}
 
-app.post('/api/v1/tours', (req, res) => {
-    // console.log(req.body)
+const createTour = (req, res) => {
     const newId = tours[tours.length - 1].id + 1
     const newTour = Object.assign({ id: newId }, req.body)
 
     tours.push(newTour)
-    // status 201: Created
+
     fs.writeFile(
         `${__dirname}/dev-data/data/tours-simple.json`,
         JSON.stringify(tours),
         (err) => {
             res.status(201).json({
+                // status 201: Created
                 status: 'success',
                 data: {
                     tour: newTour,
@@ -81,12 +63,10 @@ app.post('/api/v1/tours', (req, res) => {
             })
         }
     )
-
     // res.send('Done') // Data must always be sent in order to finish the req/res cycle
-})
+}
 
-// Updating tour data
-app.patch('/api/v1/tours/:id', (req, res) => {
+const updateTour = (req, res) => {
     if (req.params.id * 1 > tours.length) {
         return res.status(404).json({
             status: 'fail',
@@ -97,12 +77,12 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     res.status(200).json({
         status: 'success',
         data: {
-            tour: '<Updated tour here...>'
-        }
+            tour: '<Updated tour here...>',
+        },
     })
-})
+}
 
-app.delete('/api/v1/tours/:id', (req, res) => {
+const deleteTour = (req, res) => {
     if (req.params.id * 1 > tours.length) {
         return res.status(404).json({
             status: 'fail',
@@ -110,11 +90,24 @@ app.delete('/api/v1/tours/:id', (req, res) => {
         })
     }
 
-    res.status(204).json({ // Status code 204: No content
+    res.status(204).json({
+        // Status code 204: No content
         status: 'success',
-        data: null
+        data: null,
     })
-})
+}
+
+/*
+app.get('/api/v1/tours', getAllTours) // Get request => Read
+app.get('/api/v1/tours/:id', getTour)
+app.post('/api/v1/tours', createTour) // Post request => Client sends new resource to the server => Create
+app.patch('/api/v1/tours/:id', updateTour) // Patch request => Client sends only part of the updated object that has been changed to the server => Update
+app.delete('/api/v1/tours/:id', deleteTour) // Delete request: Client removes resource from the server => Delete
+Put request =>  Client sends entire updated object to the server=> Update
+*/
+
+app.route('/api/v1/tours').get(getAllTours).post(createTour)
+app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour)
 
 const port = 3000
 app.listen(port, () => {
