@@ -11,7 +11,7 @@ app.use(express.json())
 app.get('/', (req, res) => {
     res.status(200).json({
         message: 'Hello from the server side!',
-        app: 'Natours!'
+        app: 'Natours!',
     })
 })
 
@@ -34,7 +34,30 @@ app.get('/api/v1/tours', (req, res) => {
         status: 'success',
         results: tours.length, // only relevant to use when you are getting/sending an array with multiple objects
         data: {
-            tours // If data has same name as property (tours), you can exclude the value
+            tours, // If data has same name as property (tours), you can exclude the value
+        },
+    })
+})
+
+// Accounts for specific tours
+app.get('/api/v1/tours/:id', (req, res) => {
+    console.log(req.params) // req.params => object that assigns value to a variable: id
+
+    const id = req.params.id * 1 // converts string that contains numbers into a number
+    const tour = tours.find((el) => el.id === id) // find() => returns array where the logic below is true
+
+    // if (id > tours.length) {
+    if (!tour) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID',
+        })
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            tour,
         },
     })
 })
@@ -42,18 +65,22 @@ app.get('/api/v1/tours', (req, res) => {
 app.post('/api/v1/tours', (req, res) => {
     // console.log(req.body)
     const newId = tours[tours.length - 1].id + 1
-    const newTour = Object.assign({id: newId}, req.body)
+    const newTour = Object.assign({ id: newId }, req.body)
 
     tours.push(newTour)
     // status 201: Created
-    fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
-        res.status(201).json({
-            status: 'success',
-            data: {
-                tour: newTour
-            }
-        })
-    })
+    fs.writeFile(
+        `${__dirname}/dev-data/data/tours-simple.json`,
+        JSON.stringify(tours),
+        (err) => {
+            res.status(201).json({
+                status: 'success',
+                data: {
+                    tour: newTour,
+                },
+            })
+        }
+    )
 
     // res.send('Done') // Data must always be sent in order to finish the req/res cycle
 })
