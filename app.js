@@ -1,11 +1,14 @@
 const express = require('express')
 const fs = require('fs')
+const morgan = require('morgan')
 
 const app = express()
 
+// Middlewares
 // middleware => function that can modify the incoming request data
 // stands between the request and the response
 app.use(express.json())
+app.use(morgan('dev'))
 
 app.use((req, res, next) => {
     console.log('Hello from the middleware')
@@ -21,6 +24,7 @@ const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 )
 
+// Route Handlers
 const getAllTours = (req, res) => {
     console.log(req.requestTime)  // Displays time when the request was made
     res.status(200).json({
@@ -118,9 +122,11 @@ app.delete('/api/v1/tours/:id', deleteTour) // Delete request: Client removes re
 Put request =>  Client sends entire updated object to the server=> Update
 */
 
+// Routes
 app.route('/api/v1/tours').get(getAllTours).post(createTour)
 app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour)
 
+// Start server
 const port = 3000
 app.listen(port, () => {
     console.log(`App running on port ${port}`)
