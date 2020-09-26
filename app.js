@@ -7,14 +7,26 @@ const app = express()
 // stands between the request and the response
 app.use(express.json())
 
+app.use((req, res, next) => {
+    console.log('Hello from the middleware')
+    next() // calls next middleware in the stack
+})
+
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString()
+    next()
+})
+
 const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 )
 
 const getAllTours = (req, res) => {
+    console.log(req.requestTime)  // Displays time when the request was made
     res.status(200).json({
         // status 200: OK
         status: 'success',
+        requestedAt: req.requestTime,
         results: tours.length, // only relevant to use when you are getting/sending an array with multiple objects
         data: {
             tours, // If data has same name as property (tours), you can exclude the value
