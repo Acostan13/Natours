@@ -4,9 +4,20 @@ const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 )
 
+exports.checkID = (req, res, next, val) => {
+    console.log(`Tour id is : ${val}`)
+    if (req.params.id * 1 > tours.length) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID',
+        })
+    }
+    next()
+}
+
 // Route Handlers
 exports.getAllTours = (req, res) => {
-    console.log(req.requestTime)  // Displays time when the request was made
+    console.log(req.requestTime) // Displays time when the request was made
     res.status(200).json({
         // status 200: OK
         status: 'success',
@@ -23,14 +34,6 @@ exports.getTour = (req, res) => {
 
     const id = req.params.id * 1 // converts string that contains numbers into a number
     const tour = tours.find((el) => el.id === id) // find() => returns array where the logic below is true
-
-    // if (id > tours.length) {
-    if (!tour) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID',
-        })
-    }
 
     res.status(200).json({
         status: 'success',
@@ -63,13 +66,6 @@ exports.createTour = (req, res) => {
 }
 
 exports.updateTour = (req, res) => {
-    if (req.params.id * 1 > tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID',
-        })
-    }
-
     res.status(200).json({
         status: 'success',
         data: {
@@ -79,13 +75,6 @@ exports.updateTour = (req, res) => {
 }
 
 exports.deleteTour = (req, res) => {
-    if (req.params.id * 1 > tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID',
-        })
-    }
-
     res.status(204).json({
         // Status code 204: No content
         status: 'success',
