@@ -1,6 +1,8 @@
 const express = require('express')
-const fs = require('fs')
 const morgan = require('morgan')
+
+const tourRouter = require('./routes/tourRoutes')
+const userRouter = require('./routes/userRoutes')
 
 const app = express()
 
@@ -20,134 +22,6 @@ app.use((req, res, next) => {
     next()
 })
 
-const tours = JSON.parse(
-    fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
-)
-
-// Route Handlers
-const getAllTours = (req, res) => {
-    console.log(req.requestTime)  // Displays time when the request was made
-    res.status(200).json({
-        // status 200: OK
-        status: 'success',
-        requestedAt: req.requestTime,
-        results: tours.length, // only relevant to use when you are getting/sending an array with multiple objects
-        data: {
-            tours, // If data has same name as property (tours), you can exclude the value
-        },
-    })
-}
-
-const getTour = (req, res) => {
-    console.log(req.params) // req.params => object that assigns value to a variable: id
-
-    const id = req.params.id * 1 // converts string that contains numbers into a number
-    const tour = tours.find((el) => el.id === id) // find() => returns array where the logic below is true
-
-    // if (id > tours.length) {
-    if (!tour) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID',
-        })
-    }
-
-    res.status(200).json({
-        status: 'success',
-        data: {
-            tour,
-        },
-    })
-}
-
-const createTour = (req, res) => {
-    const newId = tours[tours.length - 1].id + 1
-    const newTour = Object.assign({ id: newId }, req.body)
-
-    tours.push(newTour)
-
-    fs.writeFile(
-        `${__dirname}/dev-data/data/tours-simple.json`,
-        JSON.stringify(tours),
-        (err) => {
-            res.status(201).json({
-                // status 201: Created
-                status: 'success',
-                data: {
-                    tour: newTour,
-                },
-            })
-        }
-    )
-    // res.send('Done') // Data must always be sent in order to finish the req/res cycle
-}
-
-const updateTour = (req, res) => {
-    if (req.params.id * 1 > tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID',
-        })
-    }
-
-    res.status(200).json({
-        status: 'success',
-        data: {
-            tour: '<Updated tour here...>',
-        },
-    })
-}
-
-const deleteTour = (req, res) => {
-    if (req.params.id * 1 > tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID',
-        })
-    }
-
-    res.status(204).json({
-        // Status code 204: No content
-        status: 'success',
-        data: null,
-    })
-}
-
-const getAllUsers = (req, res) => {
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet defined'
-    })
-}
-
-const createUser = (req, res) => {
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet defined'
-    })
-}
-
-const getUser = (req, res) => {
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet defined'
-    })
-}
-
-const updateUser = (req, res) => {
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet defined'
-    })
-}
-
-const deleteUser = (req, res) => {
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet defined'
-    })
-}
-
 /*
 app.get('/api/v1/tours', getAllTours) // Get request => Read
 app.get('/api/v1/tours/:id', getTour)
@@ -157,21 +31,8 @@ app.delete('/api/v1/tours/:id', deleteTour) // Delete request: Client removes re
 Put request =>  Client sends entire updated object to the server=> Update
 */
 
-// Routes
-const tourRouter = express.Router()
-const userRouter = express.Router()
-
-tourRouter.route('/').get(getAllTours).post(createTour)
-tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour)
-userRouter.route('/').get(getAllUsers).post(createUser)
-userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)
-
 // Mounting routes
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
 
-// Start server
-const port = 3000
-app.listen(port, () => {
-    console.log(`App running on port ${port}`)
-})
+module.exports = app
