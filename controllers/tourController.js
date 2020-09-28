@@ -4,6 +4,7 @@ const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 )
 
+// Route Handlers
 exports.checkID = (req, res, next, val) => {
     console.log(`Tour id is : ${val}`)
     if (req.params.id * 1 > tours.length) {
@@ -15,7 +16,20 @@ exports.checkID = (req, res, next, val) => {
     next()
 }
 
-// Route Handlers
+// Create a checkBody middleware
+// Check if body contains the name and price property
+// If not, send back 400 (bad request)
+// Add it to the post handler stack
+exports.checkBody = (req, res, next) => {
+    if (!req.params.price || !req.params.name) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Invalid name or price',
+        })
+    }
+    next()
+}
+
 exports.getAllTours = (req, res) => {
     console.log(req.requestTime) // Displays time when the request was made
     res.status(200).json({
