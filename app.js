@@ -9,8 +9,12 @@ const app = express()
 // Middlewares
 // middleware => function that can modify the incoming request data
 // stands between the request and the response
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'))
+}
+
 app.use(express.json())
-app.use(morgan('dev'))
+app.use(express.static(`${__dirname}/public`)) // serving static files
 
 app.use((req, res, next) => {
     console.log('Hello from the middleware')
