@@ -21,21 +21,35 @@ mongoose
 const tourSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'A tour must have name'],
-        unique: true
+        required: [true, 'A tour must have name'], // validator
+        unique: true,
     },
     rating: {
         type: Number,
-        default: 4.5
+        default: 4.5,
     },
     price: {
         type: Number,
-        required: [true, 'A tour must have price']
+        required: [true, 'A tour must have price'],
     },
 })
 
 // Always capitalize variables for Models or Schema objects
-const Tour = mongoose.model('Tour')
+const Tour = mongoose.model('Tour', tourSchema)
+
+const testTour = new Tour({
+    name: 'The Park Camper',
+    price: 497,
+})
+
+testTour
+    .save() // saves tour collection to the db
+    .then((doc) => {
+        console.log(doc)
+    })
+    .catch((err) => {
+        console.log('ERROR: ', err)
+    })
 
 const port = process.env.PORT || 8000
 
