@@ -4,14 +4,38 @@ const app = require('./app')
 
 dotenv.config({ path: './config.env' })
 
-const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD)
+const DB = process.env.DATABASE.replace(
+    '<PASSWORD>',
+    process.env.DATABASE_PASSWORD
+)
 
-mongoose.connect(DB, {
-    // options used to deal with deprecation warnings
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false
-}).then(() => console.log('DB connection established'))
+mongoose
+    .connect(DB, {
+        // options used to deal with deprecation warnings
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useFindAndModify: false,
+    })
+    .then(() => console.log('DB connection established'))
+
+const tourSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'A tour must have name'],
+        unique: true
+    },
+    rating: {
+        type: Number,
+        default: 4.5
+    },
+    price: {
+        type: Number,
+        required: [true, 'A tour must have price']
+    },
+})
+
+// Always capitalize variables for Models or Schema objects
+const Tour = mongoose.model('Tour')
 
 const port = process.env.PORT || 8000
 

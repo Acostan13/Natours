@@ -56,7 +56,7 @@ exports.getTour = (req, res) => {
 exports.createTour = (req, res) => {
     const newId = tours[tours.length - 1].id + 1
     // eslint-disable-next-line node/no-unsupported-features/es-syntax
-    const newTour = {id: newId, ...req.body}
+    const newTour = { id: newId, ...req.body }
 
     tours.push(newTour)
 
