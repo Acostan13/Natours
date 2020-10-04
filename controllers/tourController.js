@@ -1,35 +1,45 @@
-const Tour = require('./../models/tourModels')
+const Tour = require('../models/tourModels')
 
 // const tours = JSON.parse(
 //     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 // )
 
 // // Route Handlers
-exports.getAllTours = (req, res) => {
-    console.log(req.requestTime) // Displays time when the request was made
-    res.status(200).json({
-        // status 200: OK
-        status: 'success',
-        requestedAt: req.requestTime,
-        // results: tours.length, // only relevant to use when you are getting/sending an array with multiple objects
-        // data: {
-        //     tours, // If data has same name as property (tours), you can exclude the value
-        // },
-    })
+exports.getAllTours = async (req, res) => {
+    try {
+        const tours = await Tour.find()
+        res.status(200).json({
+            // status 200: OK
+            status: 'success',
+            results: tours.length, // only relevant to use when you are getting/sending an array with multiple objects
+            data: {
+                tours, // If data has same name as property (tours), you can exclude the value
+            },
+        })
+    } catch (err) {
+        res.status(404).json({
+            status: 'fail',
+            message: err,
+        })
+    }
 }
 
-exports.getTour = (req, res) => {
-    console.log(req.params) // req.params => object that assigns value to a variable: id
-
-    const id = req.params.id * 1 // converts string that contains numbers into a number
-    // const tour = tours.find((el) => el.id === id) // find() => returns array where the logic below is true
-
-    // res.status(200).json({
-    //     status: 'success',
-    //     data: {
-    //         tour,
-    //     },
-    // })
+exports.getTour = async (req, res) => {
+    try {
+        const tour = await Tour.findById(req.params.id)
+        // Tour.findOne({ _id: req.params.id})
+        res.status(200).json({
+            status: 'success',
+            data: {
+                tour,
+            },
+        })
+    } catch (err) {
+        res.status(404).json({
+            status: 'fail',
+            message: err,
+        })
+    }
 }
 
 exports.createTour = async (req, res) => {
