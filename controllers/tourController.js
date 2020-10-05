@@ -58,7 +58,7 @@ exports.createTour = async (req, res) => {
     } catch (err) {
         res.status(404).json({
             status: 'fail',
-            message: 'Invalid data set'
+            message: err
         })
     }
 }
@@ -67,7 +67,7 @@ exports.updateTour = async (req, res) => {
     try {
         const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
-            runValidators: true,
+            runValidators: true
         })
         res.status(200).json({
             status: 'success',
