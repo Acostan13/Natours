@@ -7,9 +7,24 @@ const Tour = require('../models/tourModels')
 // // Route Handlers
 exports.getAllTours = async (req, res) => {
     try {
-        const tours = await Tour.find()
-        res.status(200).json({
-            // status 200: OK
+        // Build the query
+        const queryObj = {...req.query}
+        const excludedFields = ['page', 'sort', 'limit', 'fields']
+        excludedFields.forEach(el => delete queryObj[el])
+        
+        const query = await Tour.find(queryObj)
+
+        // const query = await Tour.find({})
+        //     .where('duration')
+        //     .equals(5)
+        //     .where('difficulty')
+        //     .equals('easy')
+
+        // Execute the query
+        const tours = await query
+
+        // Send the response
+        res.status(200).json({ // status 200: OK
             status: 'success',
             results: tours.length, // only relevant to use when you are getting/sending an array with multiple objects
             data: {
