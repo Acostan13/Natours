@@ -7,21 +7,29 @@ const Tour = require('../models/tourModels')
 // // Route Handlers
 exports.getAllTours = async (req, res) => {
     try {
+        console.log(req.query)
         // Build the query
+        // 1) Filtering
+        // eslint-disable-next-line node/no-unsupported-features/es-syntax
         const queryObj = {...req.query}
         const excludedFields = ['page', 'sort', 'limit', 'fields']
         excludedFields.forEach(el => delete queryObj[el])
         
-        const query = await Tour.find(queryObj)
+        // 2) Advanced filtering
+        let queryStr = JSON.stringify(queryObj)
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`) // regex for <=> operators 
+        console.log(JSON.parse(queryStr))
+
+        const query = await Tour.find(JSON.parse(queryStr))
+
+        // Execute the query
+        const tours = await query
 
         // const query = await Tour.find({})
         //     .where('duration')
         //     .equals(5)
         //     .where('difficulty')
         //     .equals('easy')
-
-        // Execute the query
-        const tours = await query
 
         // Send the response
         res.status(200).json({ // status 200: OK
