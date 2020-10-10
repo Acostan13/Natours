@@ -90,7 +90,7 @@ exports.updateTour = async (req, res) => {
     } catch (err) {
         res.status(404).json({
             status: 'fail',
-            message: 'Invalid data set'
+            message: err
         })
     }
 }
