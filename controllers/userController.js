@@ -4,7 +4,7 @@ const AppError = require('../utils/appError')
 
 const filterObj = (obj, ...allowedFields) => {
     const newObj = {}
-    Object.keys(obj).forEach(el => {
+    Object.keys(obj).forEach((el) => {
         if (allowedFields.includes(el)) newObj[el] = obj[el]
     })
     return newObj
@@ -38,10 +38,14 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     const filteredBody = filterObj(req.body, 'name', 'email')
 
     // 3) Update user document
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-        new: true,
-        runValidators: true
-    })
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user.id,
+        filteredBody,
+        {
+            new: true,
+            runValidators: true
+        }
+    )
 
     res.status(200).json({
         status: 'success',
@@ -57,6 +61,15 @@ exports.createUser = (req, res) => {
         message: 'This route is not yet defined'
     })
 }
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+    await User.findByIdAndUpdate(req.user.id, { active: false })
+
+    res.status(204).json({
+        status: 'success',
+        data: null
+    })
+})
 
 exports.getUser = (req, res) => {
     res.status(500).json({
