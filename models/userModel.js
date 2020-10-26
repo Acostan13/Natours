@@ -16,9 +16,7 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         validate: [validator.isEmail, 'Please provide a valid email']
     },
-    photo: {
-        type: String
-    },
+    photo: String,
     role: {
         type: String,
         enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -79,7 +77,7 @@ userSchema.pre('save', function (next) {
 
 userSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ active: {$ne: false} })
+    this.find({ active: { $ne: false } })
     next()
 })
 
