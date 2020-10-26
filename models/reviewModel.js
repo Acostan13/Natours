@@ -16,20 +16,16 @@ const reviewSchema = new mongoose.Schema(
             type: Date,
             default: Date.now()
         },
-        tour: [
-            {
-                type: mongoose.Schema.ObjectId,
-                required: [true, 'Review must belong to a tour'],
-                ref: 'Tour'
-            }
-        ],
-        user: [
-            {
-                type: mongoose.Schema.ObjectId,
-                required: [true, 'Review must belong to a user'],
-                ref: 'User'
-            }
-        ]
+        tour: {
+            type: mongoose.Schema.ObjectId,
+            required: [true, 'Review must belong to a tour'],
+            ref: 'Tour'
+        },
+        user: {
+            type: mongoose.Schema.ObjectId,
+            required: [true, 'Review must belong to a user'],
+            ref: 'User'
+        }
     },
     {
         toJSON: { virtuals: true },
