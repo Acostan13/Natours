@@ -14,7 +14,7 @@ exports.getOverview = catchAsync(async (req, res) => {
     })
 })
 
-exports.getTour = catchAsync(async (req, res) => {
+exports.getTour = catchAsync(async (req, res, next) => {
     // 1) Get tour data for the requested tour (including reviews and guides)
     const tour = await Tour.findOne({ slug: req.params.slug }).populate({ 
         path: 'reviews',
@@ -24,9 +24,22 @@ exports.getTour = catchAsync(async (req, res) => {
     // 2) Build template
 
     // 3) Render template using data from 1)
-
     res.status(200).render('tour', {
         title: `${tour.name} Tour`,
         tour
     })
 })
+
+exports.getLoginForm = (req, res) => {
+    res.status(200).render('login', {
+        title: 'Log in to your account'
+
+    })
+}
+
+exports.getSignUpForm = (req, res) => {
+    res.status(200).render('signup', {
+        title: 'Log in to your account'
+
+    })
+}
